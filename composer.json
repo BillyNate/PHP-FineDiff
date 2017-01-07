@@ -1,5 +1,5 @@
 {
-    "name": "gorhill/php-fine-diff",
+    "name": "billynate/php-fine-diff",
     "type": "library",
     "description": "",
     "homepage": "http://www.raymondhill.net/finediff/",
@@ -9,7 +9,7 @@
     "keywords": [
         "FineDiff"
     ],
-    "version": "0.1.0",
+    "version": "0.2.0",
     "authors": [
         {
             "name": "Raymond Hill",
@@ -22,11 +22,25 @@
             "email": "f.graeser@queo-group.com",
             "homepage": "http://www.queoflow.com/",
             "role": "The-Clean-Up-Guy"
+        },
+        {
+            "name": "BillyNate",
+            "role":  "Developer"
         }
     ],
     "autoload": {
         "psr-4": {
             "GorHill\\FineDiff\\": "GorHill/FineDiff"
         }
+    },
+    "minimum-stability": "dev",
+    "repositories": [
+        {
+            "url": "https://github.com/BillyNate/GitLib.git",
+            "type": "git"
+        }
+    ],
+    "require": {
+        "billynate/gitlib": "~0.1.0"
     }
 }

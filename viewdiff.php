@@ -20,7 +20,7 @@ del {color:red;background:#fdd;text-decoration:none}
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 </head>
 <body>
-<a href="https://github.com/gorhill/PHP-FineDiff"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
+<a href="https://github.com/BillyNate/PHP-FineDiff"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
 <h1>PHP Fine Diff: Online Diff Viewer</h1>
 <div>
 <?php
@@ -37,12 +37,13 @@ if ( (function_exists("get_magic_quotes_gpc") && get_magic_quotes_gpc()) || (ini
 mb_internal_encoding('UTF-8');
 
 use GorHill\FineDiff\FineDiffHTML;
+use BillyNate\GitDiff\GitDiff;
 
 $cache_lo_water_mark = 900;
 $cache_hi_water_mark = 1100;
 $compressed_serialized_filename_extension = '.store.gz';
 
-$granularity = 2;
+$granularity = 4;
 $from_text = '';
 $to_text = '';
 $diff_opcodes = '';
@@ -88,6 +89,8 @@ else {
 			$to_text = $_POST['to'];
 			}
 		}
+		$from_text = file_get_contents('sample_from');
+		$to_text = file_get_contents('sample_to');
 
 	// limit input
 	$from_text = substr($from_text, 0, 1024*100);
@@ -100,13 +103,13 @@ else {
 	}
 
 	$granularityStacks = array(
-		FineDiffHTML::$paragraphGranularity,
-		FineDiffHTML::$sentenceGranularity,
-		FineDiffHTML::$wordGranularity,
-		FineDiffHTML::$characterGranularity,
-		FineDiffHTML::$characterGranularity
+		GitDiff::$paragraphGranularity,
+		GitDiff::$sentenceGranularity,
+		GitDiff::$wordGranularity,
+		GitDiff::$characterGranularity,
+		GitDiff::$characterGranularity
 		);
-	$diff_opcodes = FineDiffHTML::getDiffOpcodes($from_text, $to_text, $granularityStacks[$granularity], 4);
+	$diff_opcodes = GitDiff::getDiffOpcodes($from_text, $to_text, $granularityStacks[$granularity], 4);
 	$diff_opcodes_len = strlen($diff_opcodes);
 	$exec_time = gettimeofday(true) - $start_time;
 	if ( $diff_opcodes_len ) {
@@ -146,7 +149,8 @@ else {
 		}
 	}
 
-$rendered_diff = FineDiffHTML::renderDiffToHTMLFromOpcodes($from_text, $diff_opcodes, null, ($granularity != 4));
+//$rendered_diff = FineDiffHTML::renderDiffToHTMLFromOpcodes($from_text, $diff_opcodes, null, ($granularity != 4));
+$rendered_diff = GitDiff::renderToTextFromOpcodes($from_text, $diff_opcodes);
 $from_len = strlen($from_text);
 $to_len = strlen($to_text);
 
@@ -154,7 +158,8 @@ if ( !empty($data_key) ) {
 	echo '<p style="margin-right:8em;font-size:smaller">Tempolink: <a href="viewdiff.php?data=', $data_key, '">http://', $_SERVER['HTTP_HOST'], '/viewdiff.php?data=', $data_key, '</a> <span style="color:#aaa">(This link is not viewable by others, unless it has been explicitly shared by the creator. This link will exist for a limited period of time, which depends on how often it is visited.)</span></p>', "\n";
 	}
 ?>
-<div class="panecontainer" style="width:99%"><p>Diff <span style="color:gray">(diff: <?php printf('%.3f', $exec_time); ?> seconds, diff len: <?php echo $diff_opcodes_len; ?> chars)</span>&emsp;/&emsp;Show <input type="radio" name="htmldiffshow" onclick="setHTMLDiffVisibility('deletions');">Deletions only&ensp;<input type="radio" name="htmldiffshow" checked="checked" onclick="setHTMLDiffVisibility();">All&ensp;<input type="radio" name="htmldiffshow" onclick="setHTMLDiffVisibility('insertions');">Insertions only</p><div><div id="htmldiff" class="pane" style="white-space:pre-wrap"><?php
+<div class="panecontainer" style="display:inline-block;width:49.5%"><p>Delta</p><div><div class="pane"><?php echo $diff_opcodes; ?></div></div></div>
+<div class="panecontainer" style="display:inline-block;width:49.5%"><p>Result <span style="color:gray">(diff: <?php printf('%.3f', $exec_time); ?> seconds, diff len: <?php echo $diff_opcodes_len; ?> chars)</span></p><div><div id="htmldiff" class="pane" style="white-space:pre-wrap"><?php
 echo $rendered_diff; ?></div></div>
 </div>
 <form action="viewdiff.php" method="post">
