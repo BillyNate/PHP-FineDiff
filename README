@@ -2,10 +2,13 @@ Files
 -----
 
 finediff.php    : where the FineDiff class is defined, no dependencies
+gitdiff.php     : the GitDiff class, extending FineDiff, adds the use of Git opcodes, does have dependencies which can be loaded through Composer
 
 viewdiff-ex.php : demo page, render diff in HTML, show opcodes and other stats
 sample_from.txt : sample text file for demo
 sample_to.txt   : sample text file for demo
+sample_from     : sample binary file for demo
+sample_to       : sample binary file for demo
 [Text_Diff]     : required for viewdiff-ex.php demo page,
                   available at http://download.pear.php.net/package/Text_Diff-1.1.1.tgz
 
